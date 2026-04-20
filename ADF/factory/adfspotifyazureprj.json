@@ -1,0 +1,9 @@
+{
+	"name": "adfspotifyazureprj",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "bf5cc731-eb0c-4822-a45d-8ffe1ccf1a64",
+		"tenantId": "31ba2519-3f19-4c6c-95d0-9515d9b4c82a"
+	}
+}

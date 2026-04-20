@@ -1,0 +1,200 @@
+{
+	"name": "github_analyzer_daily_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachHour",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(0,24)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy_gharchive_to_lake",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sourc_gh_archive",
+									"type": "DatasetReference",
+									"parameters": {
+										"date": {
+											"value": "@pipeline().parameters.p_date",
+											"type": "Expression"
+										},
+										"hour": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_target_adls_lake",
+									"type": "DatasetReference",
+									"parameters": {
+										"date": {
+											"value": "@pipeline().parameters.p_date",
+											"type": "Expression"
+										},
+										"hour": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "databricks_job_api_call",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "ForEachHour",
+						"dependencyConditions": ["Succeeded"]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Authorization": "Bearer <REDACTED>",
+						"Content-Type": "application/json"
+					},
+					"url": "https://adb-7405607742101502.2.azuredatabricks.net/api/2.1/jobs/run-now",
+					"body": {
+						"value": "{\n        \"job_id\": 88574847092577,\n        \"notebook_params\": {\n                \"date\": \"@{pipeline().parameters.p_date}\"\n        }\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Alerts_Mail",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "databricks_job_api_call",
+						"dependencyConditions": ["Failed", "Skipped"]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": "https://prod-01.eastus.logic.azure.com:443/workflows/4fadb997fa0b481eb6809f9191946860/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=O8w24KM258qnbNtAgfBiWksKh5nYYB1Yo8_HzngBS_o",
+					"body": {
+						"value": "{\n    \"pipeline_name\": \"@{pipeline().Pipeline}\",\n    \"pipeline_runId\": \"@{pipeline().RunId}\",\n    \"pipeline_ran_for\": \"@{pipeline().parameters.p_date}\",\n    \"pipeline_status\": \"Failed\"\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Success_Mail",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "databricks_job_api_call",
+						"dependencyConditions": ["Succeeded"]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": "https://prod-01.eastus.logic.azure.com:443/workflows/4fadb997fa0b481eb6809f9191946860/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=O8w24KM258qnbNtAgfBiWksKh5nYYB1Yo8_HzngBS_o",
+					"body": {
+						"value": "{\n    \"pipeline_name\": \"@{pipeline().Pipeline}\",\n    \"pipeline_runId\": \"@{pipeline().RunId}\",\n    \"pipeline_ran_for\": \"@{pipeline().parameters.p_date}\",\n    \"pipeline_status\": \"Success\"\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "set_databricks_run_id",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "databricks_job_api_call",
+						"dependencyConditions": ["Succeeded"]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "db_run_id",
+					"value": {
+						"value": "@string(activity('databricks_job_api_call').output.run_id)\n",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"p_date": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"db_run_id": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}

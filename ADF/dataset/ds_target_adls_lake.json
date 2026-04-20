@@ -1,0 +1,33 @@
+{
+	"name": "ds_target_adls_lake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_datelake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"date": {
+				"type": "string"
+			},
+			"hour": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{dataset().date}-@{dataset().hour}.json.gz",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "bronze/@{dataset().date}",
+					"type": "Expression"
+				},
+				"fileSystem": "githubanalyzer"
+			}
+		}
+	}
+}
