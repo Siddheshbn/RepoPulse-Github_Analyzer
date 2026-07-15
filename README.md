@@ -189,6 +189,7 @@ The Streamlit dashboard displays:
 - 🔀 PR merge rate & Issue-to-PR ratio gauges
 - 📂 Public vs. Private repo distribution
 
+⚠️**NOTE** :- This project was developed and demonstrated using Azure's free trial subscription. The trial has since expired, and the associated Azure resources (ADF, ADLS Gen2, Databricks, etc.) have been decommissioned. As a result, the live application and pipeline are no longer operational. However, the complete source code, project structure, architecture, and screenshots are available in this repository for reference.
 ---
 
 ## 👤 Author
