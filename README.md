@@ -36,11 +36,11 @@ Every hour, GitHub generates millions of public events (pushes, pull requests, i
 Modern software organizations generate massive amounts of activity data through platforms like GitHub, including repository events, commits, pull requests, issues, and developer interactions. However, raw event logs are complex, nested, and difficult to analyze directly.
 
 The goal was to build a data platform capable of:
--Automating ingestion of GitHub activity data
--Processing large volumes of JSON-based event data
--Applying scalable transformations
--Creating analytics-ready datasets
--Providing engineering insights through dashboards
+- Automating ingestion of GitHub activity data
+- Processing large volumes of JSON-based event data
+- Applying scalable transformations
+- Creating analytics-ready datasets
+- Providing engineering insights through dashboards
 
 ---
 
