@@ -16,10 +16,6 @@ This project simulates a real-world enterprise data platform — covering orches
 - [Data Flow — Medallion Architecture](#-data-flow--medallion-architecture)
 - [Gold Layer Tables](#-gold-layer-tables)
 - [Dashboard Preview](#-dashboard-preview)
-- [Setup & Installation](#-setup--installation)
-- [Environment Variables](#-environment-variables)
-- [How to Run](#-how-to-run)
-- [Future Enhancements](#-future-enhancements)
 - [Author](#-author)
 
 ---
@@ -35,15 +31,21 @@ Every hour, GitHub generates millions of public events (pushes, pull requests, i
 
 ---
 
+## Problem Statement
+
+Modern software organizations generate massive amounts of activity data through platforms like GitHub, including repository events, commits, pull requests, issues, and developer interactions. However, raw event logs are complex, nested, and difficult to analyze directly.
+
+The goal was to build a data platform capable of:
+-Automating ingestion of GitHub activity data
+-Processing large volumes of JSON-based event data
+-Applying scalable transformations
+-Creating analytics-ready datasets
+-Providing engineering insights through dashboards
+
+---
+
 ## 🏗 Architecture
-
-<!-- 
-    📌 ADD YOUR ARCHITECTURE DIAGRAM HERE
-    1. Save your diagram as: assets/architecture.png
-    2. The image will render automatically below once uploaded to the repo
--->
-
-![Architecture Diagram](assets/architecture.png)
+![Architecture Diagram](Architecture.png)
 
 **High-level flow:**
 
@@ -186,73 +188,6 @@ The Streamlit dashboard displays:
 - ⭐ Most starred & most active repos (styled cards)
 - 🔀 PR merge rate & Issue-to-PR ratio gauges
 - 📂 Public vs. Private repo distribution
-
----
-
-## ⚙️ Setup & Installation
-
-### Prerequisites
-- An Azure subscription with:
-  - Azure Data Factory
-  - Azure Data Lake Storage Gen2
-  - Azure Databricks workspace (with a SQL Warehouse)
-  - Azure Logic Apps (for email alerts)
-  - An Azure AD App Registration (Service Principal) with `Storage Blob Data Contributor` / `Reader` roles on the storage account
-- Python 3.9+
-
-### Installation
-
-```bash
-git clone https://github.com/Siddheshbn/Github_Analyzer.git
-cd Github_Analyzer/"Streamlit App"
-pip install -r requirements.txt
-```
-
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file inside the `Streamlit App/` directory with the following:
-
-```env
-# Azure AD / Service Principal
-tenant_id=<your_azure_tenant_id>
-client_id=<your_azure_client_id>
-client_secret=<your_azure_client_secret>
-subscription_id=<your_azure_subscription_id>
-
-# Azure Databricks
-DATABRICKS_HOST=<your_databricks_workspace_url>
-DATABRICKS_TOKEN=<your_databricks_pat_token>
-JOB_ID=<your_databricks_job_id>
-```
-
-> ⚠️ Never commit your `.env` file or credentials to source control.
-
----
-
-## ▶️ How to Run
-
-```bash
-cd "Streamlit App"
-streamlit run main.py
-```
-
-1. Select a date in the app.
-2. Click **Analyze** — the app checks if data already exists in the lake; if not, it triggers the ADF pipeline.
-3. Pipeline and Databricks job status are polled and displayed live.
-4. Once complete, the Gold layer tables are queried and rendered as interactive dashboards.
-
----
-
-## 🔮 Future Enhancements
-
-- [ ] Store secrets/tokens in **Azure Key Vault** instead of environment variables.
-- [ ] Add **input validation** for selected dates (check data availability before triggering).
-- [ ] Extend idempotency logic with proper **pipeline run locking**.
-- [ ] Add **Repo Activity Score** and **Daily PR Activity Breakdown** to the Gold layer.
-- [ ] Migrate hardcoded config values into a central config/parameter file.
-- [ ] Add unit tests for PySpark transformation logic.
 
 ---
 
