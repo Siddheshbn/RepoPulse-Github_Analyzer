@@ -45,7 +45,7 @@ The goal was to build a data platform capable of:
 ---
 
 ## 🏗 Architecture
-![Architecture Diagram](Architecture.png)
+![Architecture Diagram](assets/Architecture.png)
 
 **High-level flow:**
 
@@ -188,6 +188,15 @@ The Streamlit dashboard displays:
 - ⭐ Most starred & most active repos (styled cards)
 - 🔀 PR merge rate & Issue-to-PR ratio gauges
 - 📂 Public vs. Private repo distribution
+
+![Demo](assets/demo_ss_1.png)
+![Demo](assets/demo_ss_2.png)
+![Demo](assets/demo_ss_3.png)
+![Demo](assets/demo_ss_4.png)
+![Demo](assets/demo_ss_5.png)
+![Demo](assets/demo_ss_6.png)
+![Demo](assets/demo_ss_7.png)
+![Demo](assets/demo_ss_8.png)
 ---
 
 > **⚠️ Note**
