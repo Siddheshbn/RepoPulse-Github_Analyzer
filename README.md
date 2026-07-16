@@ -77,7 +77,7 @@ Azure Logic Apps → Email alerts on pipeline Success / Failure
 
 ## ✨ Key Features
 
-- ⏱ **Automated hourly ingestion** of GitHub event data using parameterized, parallelized ADF pipelines (`ForEach` loop over 24 hours/day).
+- ⏱ **Automated hourly ingestion** of GitHub event data using parameterized, parallelized ADF pipelines (`ForEach` loop over 24/7).
 - 🧱 **Medallion Lakehouse architecture** (Bronze → Silver → Gold) built with PySpark and Delta Lake on Databricks.
 - 🔗 **Pipeline-to-pipeline orchestration** — ADF triggers Databricks jobs via REST API and tracks run IDs.
 - 📧 **Automated alerting** via Azure Logic Apps on pipeline success/failure.
